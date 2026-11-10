@@ -15,8 +15,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 COPY composer.json composer.lock ./
-RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache bootstrap/cache \
-    && composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+
+RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache bootstrap \
+    && echo "<?php return Illuminate\Foundation\Application::configure(basePath: dirname(__DIR__))->withRouting(web: __DIR__.'/../routes/web.php', commands: __DIR__.'/../routes/console.php', health: '/up')->withMiddleware(function ($middleware) {})->withExceptions(function ($exceptions) {})->create();" > bootstrap/app.php \
+    && composer install --no-dev --no-scripts --prefer-dist
 
 COPY . .
 
